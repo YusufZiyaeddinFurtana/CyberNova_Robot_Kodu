@@ -5,14 +5,26 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.DriveSubsystem;
+import edu.wpi.first.math.MathUtil;
+import frc.robot.Constants.DriveConstants;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 public class RobotContainer {
   // Robot susbsystem ve command'lerinin tanımlandığı bölüm
+
+  private final DriveSubsystem drive = new DriveSubsystem();
+  
+  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
   private final CommandJoystick m_driverController =
       new CommandJoystick(OperatorConstants.kDriverControllerPort);
@@ -21,41 +33,86 @@ public class RobotContainer {
 
   private final IntakeSubsystem intake = new IntakeSubsystem();
 
+  private boolean fieldRelative = false;
+
+  private final ElevatorSubsystem elevator = new ElevatorSubsystem();
+
   public RobotContainer() {
     configureBindings();
+
+    drive.setDefaultCommand(
+      drive.runEnd(this::driveWithJoystick, drive::stop)
+    );
+    autoChooser.setDefaultOption("Bekle", Commands.none());
+    autoChooser.addOption("Auto Line denemesi", createAutoLineCommand());
+    SmartDashboard.putData("Autonomous", autoChooser);
   }
 
-    private void configureBindings() {
-   m_driverController.button(1).whileTrue(
-      intake.startEnd(
-        () -> intake.takeIn(),
-        () -> intake.stop()
-      )
-    );
-    m_driverController.button(2).whileTrue(
-      intake.startEnd(
-        () -> intake.eject(),
-        () -> intake.stop())
-    );
+  private void driveWithJoystick() {
+  if (!DriverStation.isTeleopEnabled()) {
+    drive.stop();
+    return;
   }
 
-  /**
-   * Use this method to define your ;trigger->command mappings. Triggers can be created via the
-   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-   * predicate, or via the named factories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-   * joysticks}.
-   */
+  double forward = -MathUtil.applyDeadband(
+      m_driverController.getY(), OperatorConstants.kDriveDeadband)
+      * DriveConstants.kMaxModuleSpeedMPS;
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    // Replace with the robot's autonomous command when ready.
-    return Commands.none();
+  double left = -MathUtil.applyDeadband(
+      m_driverController.getX(), OperatorConstants.kDriveDeadband)
+      * DriveConstants.kMaxModuleSpeedMPS;
+
+  double rotation = -MathUtil.applyDeadband(
+      m_driverController.getZ(), OperatorConstants.kDriveDeadband)
+      * DriveConstants.kMaxAngularSpeedRPS;
+
+  if (fieldRelative) {
+    drive.driveFieldRelative(forward, left, rotation);  
+  }else{
+    drive.driveRobotRelative(forward, left, rotation);
+  }
+  SmartDashboard.putBoolean("Swerve/FieldRelative", fieldRelative);
+}
+
+  private void configureBindings() {
+  teleopButton(1).whileTrue(
+      intake.startEnd(intake::takeIn, intake::stop)
+  );
+
+  teleopButton(2).whileTrue(
+      intake.startEnd(intake::eject, intake::stop)
+  );
+
+  teleopButton(OperatorConstants.kElevatorUpButton).whileTrue(
+      elevator.runEnd(elevator::moveUp, elevator::stop)
+  );
+
+  teleopButton(OperatorConstants.kElevatorDownButton).whileTrue(
+      elevator.runEnd(elevator::moveDown, elevator::stop)
+  );
+
+  teleopButton(5).onTrue(
+      Commands.runOnce(() -> fieldRelative = !fieldRelative)
+  );
+
+  teleopButton(6).onTrue(
+      Commands.runOnce(drive::zeroHeading, drive)
+  );
+}
+
+private Trigger teleopButton(int buttonNumber) {
+    return m_driverController.button(buttonNumber)
+    .and(DriverStation::isTeleopEnabled);
+  }
+
+  private Command createAutoLineCommand() {
+    return drive.runEnd(
+      () -> drive.driveRobotRelative(
+        AutoConstants.kForwardSpeedMPS, 0.0, 0.0),
+        drive::stop
+        ).withTimeout(AutoConstants.kForwardTimeSeconds);
+  }
+  public Command getAutonomousCommand(){
+    return autoChooser.getSelected();
   }
 }
