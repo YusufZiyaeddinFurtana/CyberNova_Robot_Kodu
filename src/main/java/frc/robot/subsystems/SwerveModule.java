@@ -46,16 +46,16 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
     
         driveMotor.setNeutralMode(NeutralModeValue.Brake);
     }
-   public double getRawAngleDegrees() {
+   public double getRawAngleDegrees() { //CANcoder'ın açı okumasını dereceye çevirir
     return angleEncoder.getAbsolutePosition().getValueAsDouble() * 360.0;
 }
 
-public double getAngleDegrees() {
+public double getAngleDegrees() {  // hedef teker açısını ve sürüş açısını hesaplar, modüle uygular
     return MathUtil.inputModulus(
         getRawAngleDegrees() - angleOffsetDegrees, 0.0, 360.0);
     }
 
-    public void setDesiredState(SwerveModuleState desiredState) {
+    public void setDesiredState(SwerveModuleState desiredState) { 
         if (Math.abs(desiredState.speedMetersPerSecond) < 0.02) {
             stop();
             return;

@@ -35,6 +35,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     public boolean isAtUpperLimit(){
         return upperLimit.get();
     }
+
+     //üst limite gelindiğinde asansörün durması sağlanıyor
        public void moveUp() {
         if (isAtUpperLimit()) {
             stop();
@@ -42,7 +44,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
          elevatorMotor.setControl(motorRequest.withOutput(ElevatorConstants.kUpOutput));
     }
-
+    //alt limite gelindiğinde asansörün durması sağlanıyor
        public void moveDown() {
         if (isAtLowerLimit()) {
             stop();

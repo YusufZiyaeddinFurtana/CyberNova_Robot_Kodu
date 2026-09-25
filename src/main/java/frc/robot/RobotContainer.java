@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 public class RobotContainer {
-  // Robot susbsystem ve command'lerinin tanımlandığı bölüm
+  // Robot subsystem ve command'lerinin tanımlandığı bölüm
 
   private final DriveSubsystem drive = new DriveSubsystem();
   
@@ -29,19 +29,19 @@ public class RobotContainer {
   private final CommandJoystick m_driverController =
       new CommandJoystick(OperatorConstants.kDriverControllerPort);
 
- // subsystemlar, OI cihazları, ve command'leri tutan robot container'ı
 
   private final IntakeSubsystem intake = new IntakeSubsystem();
 
-  private boolean fieldRelative = false;
+  private boolean fieldRelative = false; // sürüş robot relative başlar, 5. düğme field relative'i açıp kapatır 
 
   private final ElevatorSubsystem elevator = new ElevatorSubsystem();
 
   public RobotContainer() {
+    //Subsystem, komutlar ve otonom seçeneklerinin bağlandığı bölüm
     configureBindings();
 
     drive.setDefaultCommand(
-      drive.runEnd(this::driveWithJoystick, drive::stop)
+      drive.runEnd(this::driveWithJoystick, drive::stop) //joystick komutları sürekli okunur, bittiğinde "stop" çalışır.
     );
     autoChooser.setDefaultOption("Bekle", Commands.none());
     autoChooser.addOption("Auto Line denemesi", createAutoLineCommand());
@@ -49,7 +49,7 @@ public class RobotContainer {
   }
 
   private void driveWithJoystick() {
-  if (!DriverStation.isTeleopEnabled()) {
+  if (!DriverStation.isTeleopEnabled()) { //robotun Teleop modunda olup olmadığını kontrol edip karışmasını önler
     drive.stop();
     return;
   }
@@ -74,7 +74,7 @@ public class RobotContainer {
   SmartDashboard.putBoolean("Swerve/FieldRelative", fieldRelative);
 }
 
-  private void configureBindings() {
+  private void configureBindings() { // Düğmelerin görevlerinin atandığı bölüm
   teleopButton(1).whileTrue(
       intake.startEnd(intake::takeIn, intake::stop)
   );
@@ -101,11 +101,12 @@ public class RobotContainer {
 }
 
 private Trigger teleopButton(int buttonNumber) {
+  //Teleop butonlarının yalnızca teleop modunda çalışmasını sağlamak için
     return m_driverController.button(buttonNumber)
     .and(DriverStation::isTeleopEnabled);
   }
 
-  private Command createAutoLineCommand() {
+  private Command createAutoLineCommand() { //Auto Line'a süreli ilerleme
     return drive.runEnd(
       () -> drive.driveRobotRelative(
         AutoConstants.kForwardSpeedMPS, 0.0, 0.0),

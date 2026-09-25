@@ -48,7 +48,7 @@ public class DriveSubsystem extends SubsystemBase{
         double leftMetersPerSecond,
         double counterClockwiseRPS
     ) {
-        ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+        ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds( // Sürücüye göre(field relative) hareket komutlarını robot merkezli(robot relative) hareket komutlarına çevirir
             forwardMetersPerSecond,
             leftMetersPerSecond,
             counterClockwiseRPS,
@@ -110,7 +110,7 @@ public class DriveSubsystem extends SubsystemBase{
         counterClockwiseRPS
     );
 
-    SwerveDriveKinematics.desaturateWheelSpeeds(
+    SwerveDriveKinematics.desaturateWheelSpeeds( //Dört tekerin istenen hızlarını ortak üst sınıra ölçekler
         states, DriveConstants.kMaxModuleSpeedMPS
     );
 

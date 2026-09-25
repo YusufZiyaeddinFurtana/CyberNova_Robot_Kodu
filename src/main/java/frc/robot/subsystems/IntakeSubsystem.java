@@ -53,12 +53,12 @@ public class IntakeSubsystem extends SubsystemBase{
         rightIntakeMotor.set(IntakeConstants.kIntakeOut);
     }
     public void eject() {
-        //işlem sonrası motor çıkışını sıfırlar
+        //küpü fırlatmak için motoru ters yönde çalıştırır
         leftIntakeMotor.set(IntakeConstants.kEjectOutput);
         rightIntakeMotor.set(IntakeConstants.kEjectOutput);
     }
     public void stop() {
-        //küpü fırlatmak için motoru ters yönde çalıştırır
+        //işlem sonrası motor çıkışını sıfırlar
        leftIntakeMotor.stopMotor();
         rightIntakeMotor.stopMotor();
     }

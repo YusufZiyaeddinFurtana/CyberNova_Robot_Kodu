@@ -22,17 +22,16 @@ public final class Constants {
 
 public static class IntakeConstants {
   
-  // geçiçi can ID
   public static final int kCurrentLimitAmps = 20;
-  // Geçici içeri alma çıkışı: %30
+  // içeri alma çıkışı: %30
   public static final double kIntakeOut = 0.30;
-  // Geçici dışarı verme çıkışı (ters yönlü)
+  // dışarı verme çıkışı (ters yönlü) : %30
   public static final double kEjectOutput = -0.30;
   
-  //Geçici ayarlar
+  // sağ ve sol intake'ler
 public static final int kLeftMotorCanId = 14;
 public static final int kRightMotorCanId = 15;
-
+  //sağ motor terslenir (ki karşılıklı rulolar küpü aynı yöne taşıyabilsin)
 public static final boolean kLeftMotorInverted = false;
 public static final boolean kRightMotorInverted = true;
   }
@@ -42,7 +41,7 @@ public static final boolean kRightMotorInverted = true;
     public static final double kUpOutput = 0.15; 
     public static final double kDownOutput = -0.15;
 
-    //DIO 0 alt DIO 1 üst sınır ise
+    //NC limit switch bağlantıları: DIO 0 alt DIO 1 üst sınır olarak eşlenir
 
     public static final int kLowerLimitDioPort = 0;
     public static final int kUpperLimitDioPort = 1;
@@ -80,6 +79,7 @@ public static final double kSteerKp = 0.005;
 
     public static final int kPigeonId = 20;
 
+    //4 modülün ileri bakış yönü CANcoder 0°
     public static final double kFrontLeftOffsetDegrees = 0.0;
     public static final double kFrontRightOffsetDegrees = 0.0;
     public static final double kRearLeftOffsetDegrees = 0.0;
