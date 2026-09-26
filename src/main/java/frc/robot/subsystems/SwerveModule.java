@@ -76,9 +76,11 @@ public double getAngleDegrees() {  // hedef teker açısını ve sürüş açıs
         DriveConstants.kMaxSteerDutyCycle
         ));
 
+  // Teker hızlarının oranını koruyarak motor çıkışlarını ölçekler.
     double driveOutput =
-        desiredState.speedMetersPerSecond
-        / DriveConstants.kMaxModuleSpeedMPS;
+    desiredState.speedMetersPerSecond
+    / DriveConstants.kMaxModuleSpeedMPS
+    * DriveConstants.kMaxDriveDutyCycle;
 
     driveMotor.setControl(driveRequest.withOutput(MathUtil.clamp(
         driveOutput,
